@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <script type="text/javascript" src="upload.js"></script>
+    <style>
+      body {
+        background-color: black;
+      }
+      input {
+        background-color: gray;
+      }
+      p {
+        color: gray;
+      }
+    </style>
+  </head>
+  <body>
+    <form enctype="multipart/form-data" action="" method="post">
+      <p>Endpoint: <input id="endpoint" type="text" /> </p>
+      <p>API Key: <input id="api-key" type="text" /> </p>
+      <p>File: <input id="file-input" type="file" onchange="startReading(this.files[0])" /> </p>
+    </form>
+  </body>
+</html>
