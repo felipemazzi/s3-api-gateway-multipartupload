@@ -1,0 +1,205 @@
+---
+swagger: "2.0"
+info:
+  description: "Proxy to S3 API"
+  version: "2021-03-02T03:55:47Z"
+  title: "s3api"
+host: "API_ID.execute-api.REGION.amazonaws.com"
+basePath: "/test"
+schemes:
+- "https"
+paths:
+  /{folder}/{item}:
+    post:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uploads"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "uploadId"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "item"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "folder"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Content-Type:
+              type: "string"
+      security:
+      - api_key: []
+      x-amazon-apigateway-integration:
+        credentials: "IAM_ROLE_ARN"
+        uri: "arn:aws:apigateway:REGION:s3:path/{bucket}/{object}"
+        httpMethod: "POST"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Content-Type: "integration.response.header.Content-Type"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestParameters:
+          integration.request.path.object: "method.request.path.item"
+          integration.request.querystring.uploads: "method.request.querystring.uploads"
+          integration.request.path.bucket: "method.request.path.folder"
+          integration.request.querystring.uploadId: "method.request.querystring.uploadId"
+        passthroughBehavior: "when_no_match"
+        type: "aws"
+    put:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uploadId"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "item"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "folder"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "partNumber"
+        in: "query"
+        required: false
+        type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Expose-Headers:
+              type: "string"
+            Access-Control-Allow-Origin:
+              type: "string"
+            ETag:
+              type: "string"
+      security:
+      - api_key: []
+      x-amazon-apigateway-integration:
+        credentials: "IAM_ROLE_ARN"
+        uri: "arn:aws:apigateway:REGION:s3:path/{bucket}/{object}"
+        httpMethod: "PUT"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.ETag: "integration.response.header.ETag"
+              method.response.header.Access-Control-Expose-Headers: "'ETag'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestParameters:
+          integration.request.path.object: "method.request.path.item"
+          integration.request.querystring.partNumber: "method.request.querystring.partNumber"
+          integration.request.querystring.uploadId: "method.request.querystring.uploadId"
+          integration.request.path.bucket: "method.request.path.folder"
+        passthroughBehavior: "when_no_match"
+        type: "aws"
+    delete:
+      produces:
+      - "application/json"
+      parameters:
+      - name: "uploadId"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "item"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "folder"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+      security:
+      - api_key: []
+      x-amazon-apigateway-integration:
+        credentials: "IAM_ROLE_ARN"
+        uri: "arn:aws:apigateway:REGION:s3:path/{bucket}/{object}"
+        httpMethod: "DELETE"
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestParameters:
+          integration.request.path.object: "method.request.path.item"
+          integration.request.querystring.uploadId: "method.request.querystring.uploadId"
+          integration.request.path.bucket: "method.request.path.folder"
+        passthroughBehavior: "when_no_match"
+        type: "aws"
+    options:
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "200 response"
+          schema:
+            $ref: "#/definitions/Empty"
+          headers:
+            Access-Control-Allow-Origin:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Headers:
+              type: "string"
+      x-amazon-apigateway-integration:
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Methods: "'DELETE,OPTIONS,POST,PUT'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        requestTemplates:
+          application/json: "{\"statusCode\": 200}"
+        passthroughBehavior: "when_no_match"
+        type: "mock"
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "x-api-key"
+    in: "header"
+definitions:
+  Empty:
+    type: "object"
+    title: "Empty Schema"
+x-amazon-apigateway-gateway-responses:
+  DEFAULT_5XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Methods: "'DELETE,OPTIONS,POST,PUT'"
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+  DEFAULT_4XX:
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Methods: "'DELETE,OPTIONS,POST,PUT'"
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+x-amazon-apigateway-binary-media-types:
+- "application/octet-stream"
