@@ -39,10 +39,13 @@ async function finishReading(arrayBuffer) {
 	
 	let etags = [];
 	
+	updateProgress(0, slices.length);
+	
 	for (let slice of slices) {
 		log('slice ' + i + ': ' + slice.byteLength);
 		etags[i-1] = await upload(slice, i, uploadId);
 		log('ETag: ' + etags[i-1]);
+		updateProgress(i, slices.length);
 		i++;
 	}
 	
@@ -103,12 +106,24 @@ async function initiateMultipartUpload() {
   const response = await fetch(endpoint, {
     method: 'POST',
     mode: 'cors', 
-    headers: {
-      'x-api-key': getApiKey()
-    }
+    headers: getAdditionalHeaders()
   });
   log(response);
   return response;
+}
+
+function getAdditionalHeaders() {
+  let stringHeaders = document.getElementById("headers").value;
+  let arrayHeaders = stringHeaders.split("\n");
+  let headers = new Headers();
+  
+  for (var header of arrayHeaders) {
+    let pair = header.split(":");
+    headers.append(pair[0], pair[1]);
+    log(pair[0] + ': ' + pair[1]);
+  }
+  
+  return headers;
 }
 
 async function upload(sliceData, sliceNumber, uploadId) {
@@ -121,13 +136,13 @@ async function upload(sliceData, sliceNumber, uploadId) {
   }
   log(endpoint);
   
+  let requestHeaders = getAdditionalHeaders();
+  requestHeaders.append('Content-Type', 'application/octet-stream');
+  
   const response = await fetch(endpoint, {
     method: 'PUT',
     mode: 'cors', 
-    headers: {
-      'Content-Type': 'application/octet-stream',
-      'x-api-key': getApiKey() 
-    },
+    headers: requestHeaders,
     body: sliceData
   });
   log('Response part ' + sliceNumber + ': ');
@@ -143,10 +158,6 @@ async function upload(sliceData, sliceNumber, uploadId) {
 
 function getEndpoint() {
   return document.getElementById("endpoint").value.concat(encodeURIComponent(getFileName()));
-}
-
-function getApiKey() {
-  return document.getElementById("api-key").value;
 }
 
 async function completeMultipartUpload(etags, uploadId) {
@@ -165,13 +176,13 @@ async function completeMultipartUpload(etags, uploadId) {
   bodyString = bodyString.concat("</CompleteMultipartUpload>");
   log(bodyString);
   
+  let requestHeaders = getAdditionalHeaders();
+  requestHeaders.append('Content-Type', 'application/xml');
+  
   const response = await fetch(endpoint, {
     method: 'POST',
     mode: 'cors', 
-    headers: {
-      'Content-Type': 'application/xml',
-      'x-api-key': getApiKey()
-    },
+    headers: requestHeaders,
     body: bodyString 
   });
   log(response);
@@ -180,4 +191,9 @@ async function completeMultipartUpload(etags, uploadId) {
 
 function getFileName() {
   return document.getElementById("file-input").files[0].name;
+}
+
+function updateProgress(currentSlice, totalSlices) {
+  let currentProgress = Math.fround(currentSlice / totalSlices);
+  document.getElementById("upload-progress").value = currentProgress;
 }

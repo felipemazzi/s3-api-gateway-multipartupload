@@ -5,9 +5,6 @@
       body {
         background-color: black;
       }
-      input {
-        background-color: gray;
-      }
       p {
         color: gray;
       }
@@ -15,9 +12,10 @@
   </head>
   <body>
     <form enctype="multipart/form-data" action="" method="post">
-      <p>Endpoint: <input id="endpoint" type="text" /> </p>
-      <p>API Key: <input id="api-key" type="text" /> </p>
-      <p>File: <input id="file-input" type="file" onchange="startReading(this.files[0])" /> </p>
+      <p><label for="endpoint">Endpoint: </label> <input id="endpoint" type="url" /> </p>
+      <p><label for="headers">Additional Headers (one header per line): </label> <textarea id="headers" placeholder="header: value"></textarea> </p>
+      <p><label for="file-input">File: </label> <input id="file-input" type="file" onchange="startReading(this.files[0])" /> </p>
+      <p><label for="upload-progress">Upload Progress: </label> <progress id="upload-progress"></progress> </p>
     </form>
   </body>
 </html>
